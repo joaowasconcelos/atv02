@@ -1,81 +1,120 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button, TextInput, TouchableOpacity, Alert} from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { DatabaseConnection } from "../../database/database";
 
-const db = new DatabaseConnection.getConnection
+const db = DatabaseConnection.getConnection()
 
 export default function Cadastro() {
-    const navigation = useNavigation();
-    const [descricao, setDescicao] = useState();
-    const [genero, setGenero] = useState();
-    const [data, setData ] = useState();
-    const [classf, setClassf] = useState()
-    const [id, setId] = useState();
-   
-    const adicionarFilmes = () => {
-        if (descricao === null || descricao.trim() === "") {
-            Alert.alert("Erro", "Insira um valor válido descrição");
-            return;
-        }else if(genero == null || genero.trim()== ""){
-            Alert.alert("Erro", "Insira um valor válido para o genero");
-            return;
-        }
-        db.transaction(tx => {
-            tx.executeSql("INSERT INTO filmes1 (nome_filme, genero, classificacao, data) VALUES (?,?,?,?)",
-              [descricao, genero, classf,data],
-              (_,) => {
-                Alert.alert("Info", "Registro inserido com sucesso")
-                setDescicao("");
-                setClassf("")
-                setData("")
-                setGenero("")
-              },
-              (_, error) => {
-                console.error("erro ao adicionar um filme", error),
-                  Alert.alert("Erro", "ocorreu um erro ao adicionar um filme")
-              }
-            )
-          })
+  const navigation = useNavigation();
+  const [descricao, setDescicao] = useState("");
+  const [genero, setGenero] = useState("");
+  const [data, setData] = useState("");
+  const [classf, setClassf] = useState("");
 
-        
+  const adicionarFilmes = () => {
+    if (!descricao.trim() || !genero.trim() || !data.trim() || !classf.trim()) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos");
+      return;
     }
 
-    return (
-        <SafeAreaView style={styles.container}>
-             <View style={{gap:15}}>
-              <Text style={{}}>CADASTRO NOVO FILME</Text>
-            <TextInput style={styles.input} value={descricao} onChangeText={setDescicao} placeholder='Digite uma descrição' ></TextInput>
-            <TextInput style={styles.input} value={genero} onChangeText={setGenero} placeholder='Digite uma Genero' ></TextInput>
-            <TextInput style={styles.input} value={classf} onChangeText={setClassf} placeholder='Digite uma Classificação' ></TextInput>
-            <TextInput style={styles.input} value={data} onChangeText={setData} placeholder='Digite uma data' ></TextInput>
-            <TouchableOpacity onPress={adicionarFilmes}><Text>Salvar</Text></TouchableOpacity>
-          </View>
-        </SafeAreaView>
-    )
+    db.transaction(tx => {
+      tx.executeSql("INSERT INTO filmes1 (nome_filme, genero, classificacao, data) VALUES (?,?,?,?)",
+        [descricao, genero, classf, data],
+        () => {
+          Alert.alert("Info", "Registro inserido com sucesso");
+          setDescicao("");
+          setGenero("");
+          setClassf("");
+          setData("");
+        },
+        (_, error) => {
+          console.error("Erro ao adicionar um filme:", error),
+            Alert.alert("Erro", "Ocorreu um erro ao adicionar um filme");
+        }
+      );
+    });
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.title}>CADASTRO NOVO FILME</Text>
+          <TextInput
+            style={styles.input}
+            value={descricao}
+            onChangeText={setDescicao}
+            placeholder='Digite uma descrição'
+          />
+          <TextInput
+            style={styles.input}
+            value={genero}
+            onChangeText={setGenero}
+            placeholder='Digite um gênero'
+          />
+          <TextInput
+            style={styles.input}
+            value={classf}
+            onChangeText={setClassf}
+            placeholder='Digite uma classificação'
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            value={data}
+            onChangeText={setData}
+            placeholder='Digite uma data'
+            keyboardType="numeric"
+          />
+          <TouchableOpacity onPress={adicionarFilmes} style={styles.button}>
+            <Text style={styles.buttonText}>Salvar</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      padding: 20,
-      justifyContent:"center", alignItems:"center", display:"flex"
-   
-
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   input: {
-      flexGrow: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      alignItems: "center",
-      width: "90%",
-      height: "8%",
-      borderRadius: 10,
-      borderColor:"black",
-      borderWidth:2,
-},
-
-
+    width: "100%",
+    height: 40,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "black",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
+    width: "100%",
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
