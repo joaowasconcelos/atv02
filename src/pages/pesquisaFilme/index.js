@@ -9,6 +9,7 @@ export default function App() {
     const [input, setInput] = useState('');
     const [resultado, setResultado] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
+    const dataAtual = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
     const handleButtonClick = () => {
         setModalVisible(true);
@@ -32,7 +33,7 @@ export default function App() {
         db.transaction(tx => {
             tx.executeSql(
                 'SELECT * FROM filmes1 WHERE nome_filme LIKE ? OR id LIKE ?',
-                [`%${input}%`, `%${input}%`],
+                [`%${input}%`, `%${input}%`, `%${input}%`],
                 (_, { rows }) => {
                     if (rows.length === 0) {
                         Alert.alert('Erro', 'Filme não encontrado');

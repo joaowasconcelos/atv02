@@ -12,15 +12,16 @@ export default function Cadastro() {
   const [genero, setGenero] = useState("");
   const [data, setData] = useState("");
   const [classf, setClassf] = useState("");
+  
 
   const adicionarFilmes = () => {
-    if (!descricao.trim() || !genero.trim() || !data.trim() || !classf.trim()) {
+    if (!descricao.trim() || !genero.trim() || !classf.trim()) {
       Alert.alert("Erro", "Por favor, preencha todos os campos");
       return;
     }
 
     db.transaction(tx => {
-      tx.executeSql("INSERT INTO filmes1 (nome_filme, genero, classificacao, data) VALUES (?,?,?,?)",
+      tx.executeSql("INSERT INTO filmes1 (nome_filme, genero, classificacao, data) VALUES (?,?,?,date('now'))",
         [descricao, genero, classf, data],
         () => {
           Alert.alert("Info", "Registro inserido com sucesso");
@@ -64,13 +65,13 @@ export default function Cadastro() {
             placeholder='Digite uma classificação'
             keyboardType="numeric"
           />
-          <TextInput
+          {/* <TextInput
             style={styles.input}
             value={data}
             onChangeText={setData}
             placeholder='Digite uma data'
             keyboardType="numeric"
-          />
+          /> */}
           <TouchableOpacity onPress={adicionarFilmes} style={styles.button}>
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
